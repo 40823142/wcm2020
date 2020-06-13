@@ -1,6 +1,146 @@
 <h1>每周筆記</h1>
-<p></p>
+<p><img alt="" height="460" src="/images/55519002.png" width="460"/></p>
 <p>： )</p>
 <h2>第一周~第六周</h2>
-<p>安裝可攜系統</p>
+<ul>
+<li>安裝可攜系統</li>
+<li>安裝最新版本的Python</li>
+<li>安裝完Msys2後先把主檔案複製到自己得隨身系統裡</li>
+<li>反安裝Msys2 目的是之後不受安裝路徑的控制</li>
+<li>Python同上</li>
+<li>設定<span>start.bat裡的Msys2路徑</span></li>
+<li><span><img alt="" height="380" src="/images/未命s名.png" width="866"/></span></li>
+<li><span>用mingw64安裝 base-devel和gcc和make</span></li>
+<li><span>編譯程式測試</span></li>
+<li>
+<pre class="brush:py;auto-links:false;toolbar:false" contenteditable="false">// hello.c
+#include &lt;stdio.h&gt;
+
+int main() {
+    printf("Hello, world!\n");
+    return 0;
+}</pre>
+<p>生成一個hello.c </p>
+完成後用ming64執行hello.exe</li>
+</ul>
 <p></p>
+<p></p>
+<h2>第六周~第九周 防疫期間</h2>
+<p><span></span></p>
+<ul>
+<li><span>以Youtube + Portable OBS 利用 IPv6 進行直播測試</span></li>
+<li><span>分小組</span></li>
+<li>使用Google Meet 測試</li>
+<li><img alt="" height="262" src="/images/未命s名.png" width="618"/></li>
+<li>用月曆進行Meet的邀請<img alt="" height="315" src="/images/MEET.png" width="599"/></li>
+<li>使用OBS 直播畫面和Camera視訊</li>
+<li>在家上課</li>
+<li>期中考報告</li>
+<li>然後就不能再家上課了： (</li>
+</ul>
+<h2>第十周~第十一周</h2>
+<ul>
+<li>使用Python程式讀取學員選修檔案 把期中自評成績填上
+<pre class="brush:py;auto-links:false;toolbar:false" contenteditable="false">import csv
+ 
+# read student list
+ 
+filename = 'E:/wcm2020/data/tmp/2020_spring_score/2a/2a_list.txt'
+with open(filename, encoding="utf-8") as f:
+    content = f.readlines()
+#print(content)
+student = [x.strip() for x in content] 
+#print(student)
+ 
+ 
+# Timestamp, email, 修課名稱, url, score, desp, memo
+# 0, 1, 2, 3, 4, 5, 6
+#total = 0
+all = {}
+with open('y:/2020midterm.csv', encoding="utf-8") as csv_file:
+    csv_reader = csv.reader(csv_file, delimiter=',')
+    #print(csv_reader)
+ 
+    line_count = 0
+    for row in csv_reader:
+        if line_count == 0:
+            #print(f'Column names are {", ".join(row)}')
+            line_count += 1
+        else:
+            student_num = row[1].split("@")[0]
+            #print(student_num)
+            student_score = row[4]
+            #print(student_score)
+            try:
+                all.update({student_num: student_score})
+            except:
+                all.update({student_num: "error"})
+            #print(f'\t{row[0]} works in the {row[1]} department, and was born in {row[2]}.')
+            #print(f'\t{row[4]}')
+            #total += int(row[4])
+            line_count += 1
+#print(all)
+#print(student)
+ 
+ 
+for i in student:
+     
+    #if i in all:
+        #pass
+    #else:
+        #print(str(i))
+     
+    try:
+        print(i + "\t" + all[i])
+    except:
+        print(i + "\t60")
+ 
+    #print(f'Processed {line_count} lines.')
+    #print("平均=" + str(total/line_count))</pre>
+<p></p>
+</li>
+<li>使用SSH來推檔案</li>
+</ul>
+<ol>
+<li>開啟<span>sh.exe</span></li>
+<li><code class="js plain">ssh-keygen -t rsa -b 4096 -C </code><code class="js string">"使用者學號"</code></li>
+<li><code class="js string"><span>建立private key 和 public key</span></code></li>
+<li><code class="js string"><span>用SciTE 開 id_rsa.pub 後, 把 public key 的內容 複製到 Github的SSH and GPG keys </span></code></li>
+<li>
+<p>用 puttygen.exe 將 id_rsa 轉成 Putty .ppk 格式 指定利用 putty 目錄下的 plink 執行 git 指令</p>
+</li>
+<li>把start.bat 加入
+<pre class="brush:py;auto-links:false;toolbar:false" contenteditable="false">set GIT_HOME=%Disk%:\portablegit\bin\
+set GIT_SSH=%Disk%:\putty\plink.exe</pre>
+<p></p>
+</li>
+<li>
+<p>用 puttygen.exe 載入 id_rsa.</p>
+<p>開啟 puttygen 用 load 載入 id_rsa, 成功載入後 用 save private key 按紐 把 .ppk 存檔.  檔案要在設定 putty 中 github.com session 時, 在 Connection-&gt;SSH-&gt;Auth 項目下, 將轉檔後的 .ppk 指向 private key file for authentication</p>
+</li>
+<li>把.ssh中的config設定檔設為
+<pre class="brush:py;auto-links:false;toolbar:false" contenteditable="false"># no proxy at home
+#ProxyCommand y:/PortableGit/mingw64/bin/connect.exe -H proxy.mde.nfu.edu.tw:3128 %h %p
+# set git_ssh=y:/putty/plink.exe with auth under putty github.com session setup
+ProxyCommand y:/putty/plink.exe github.com %h %p
+  
+Host github.com
+    User git
+    Port 22
+    Hostname github.com
+     
+    # for connect.exe need openssh key format
+    #IdentityFile "y:\home\.ssh\id_rsa_mdecourse"
+    # for plink.exe need rsa key format but set under putty github.com session
+    # plink.exe do not need the following setting
+    #IdentityFile "y:\home\.ssh\mdecourse_putty_private.ppk"
+  
+    TCPKeepAlive yes
+    IdentitiesOnly yes</pre>
+<p></p>
+<h2>第十二周~第十五周</h2>
+</li>
+</ol>
+<ul>
+<li>說明如何安裝虛擬主機</li>
+</ul>

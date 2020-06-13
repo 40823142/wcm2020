@@ -108,6 +108,7 @@ img.add_border {
 </head>
 <body>
 <div class='container'><nav>
+        
     <div class="site-wrap">
 
     <div class="site-mobile-menu">
@@ -153,4 +154,146 @@ img.add_border {
           </div>
           
         </header>
-    </nav><section><h1>Site Map</h1><div id="tipue_search_content"></div><ul><li><a href='每周筆記.html'>每周筆記</a><ul><li><a href='第一周~第六周.html'>第一周~第六周</a><li><a href='第六周~第九周 防疫期間.html'>第六周~第九周 防疫期間</a><li><a href='第十周~第十一周.html'>第十周~第十一周</a><li><a href='第十二周~第十五周.html'>第十二周~第十五周</a></li></ul></section></div></body></html>
+    <div id="tipue_search_content">第六周~第九周 防疫期間 << <a href='第六周~第九周 防疫期間.html'>Previous</a> <a href='第十二周~第十五周.html'>Next</a> >> 第十二周~第十五周<br /><h1>第十周~第十一周</h1>
+<ul>
+<li>使用Python程式讀取學員選修檔案 把期中自評成績填上
+<pre class="brush:py;auto-links:false;toolbar:false" contenteditable="false">import csv
+ 
+# read student list
+ 
+filename = 'E:/wcm2020/data/tmp/2020_spring_score/2a/2a_list.txt'
+with open(filename, encoding="utf-8") as f:
+    content = f.readlines()
+#print(content)
+student = [x.strip() for x in content] 
+#print(student)
+ 
+ 
+# Timestamp, email, 修課名稱, url, score, desp, memo
+# 0, 1, 2, 3, 4, 5, 6
+#total = 0
+all = {}
+with open('y:/2020midterm.csv', encoding="utf-8") as csv_file:
+    csv_reader = csv.reader(csv_file, delimiter=',')
+    #print(csv_reader)
+ 
+    line_count = 0
+    for row in csv_reader:
+        if line_count == 0:
+            #print(f'Column names are {", ".join(row)}')
+            line_count += 1
+        else:
+            student_num = row[1].split("@")[0]
+            #print(student_num)
+            student_score = row[4]
+            #print(student_score)
+            try:
+                all.update({student_num: student_score})
+            except:
+                all.update({student_num: "error"})
+            #print(f'\t{row[0]} works in the {row[1]} department, and was born in {row[2]}.')
+            #print(f'\t{row[4]}')
+            #total += int(row[4])
+            line_count += 1
+#print(all)
+#print(student)
+ 
+ 
+for i in student:
+     
+    #if i in all:
+        #pass
+    #else:
+        #print(str(i))
+     
+    try:
+        print(i + "\t" + all[i])
+    except:
+        print(i + "\t60")
+ 
+    #print(f'Processed {line_count} lines.')
+    #print("平均=" + str(total/line_count))</pre>
+<p></p>
+</li>
+<li>使用SSH來推檔案</li>
+</ul>
+<ol>
+<li>開啟<span>sh.exe</span></li>
+<li><code class="js plain">ssh-keygen -t rsa -b 4096 -C </code><code class="js string">"使用者學號"</code></li>
+<li><code class="js string"><span>建立private key 和 public key</span></code></li>
+<li><code class="js string"><span>用SciTE 開 id_rsa.pub 後, 把 public key 的內容 複製到 Github的SSH and GPG keys </span></code></li>
+<li>
+<p>用 puttygen.exe 將 id_rsa 轉成 Putty .ppk 格式 指定利用 putty 目錄下的 plink 執行 git 指令</p>
+</li>
+<li>把start.bat 加入
+<pre class="brush:py;auto-links:false;toolbar:false" contenteditable="false">set GIT_HOME=%Disk%:\portablegit\bin\
+set GIT_SSH=%Disk%:\putty\plink.exe</pre>
+<p></p>
+</li>
+<li>
+<p>用 puttygen.exe 載入 id_rsa.</p>
+<p>開啟 puttygen 用 load 載入 id_rsa, 成功載入後 用 save private key 按紐 把 .ppk 存檔.  檔案要在設定 putty 中 github.com session 時, 在 Connection-&gt;SSH-&gt;Auth 項目下, 將轉檔後的 .ppk 指向 private key file for authentication</p>
+</li>
+<li>把.ssh中的config設定檔設為
+<pre class="brush:py;auto-links:false;toolbar:false" contenteditable="false"># no proxy at home
+#ProxyCommand y:/PortableGit/mingw64/bin/connect.exe -H proxy.mde.nfu.edu.tw:3128 %h %p
+# set git_ssh=y:/putty/plink.exe with auth under putty github.com session setup
+ProxyCommand y:/putty/plink.exe github.com %h %p
+  
+Host github.com
+    User git
+    Port 22
+    Hostname github.com
+     
+    # for connect.exe need openssh key format
+    #IdentityFile "y:\home\.ssh\id_rsa_mdecourse"
+    # for plink.exe need rsa key format but set under putty github.com session
+    # plink.exe do not need the following setting
+    #IdentityFile "y:\home\.ssh\mdecourse_putty_private.ppk"
+  
+    TCPKeepAlive yes
+    IdentitiesOnly yes</pre>
+<p></p>
+<br />第六周~第九周 防疫期間 << <a href='第六周~第九周 防疫期間.html'>Previous</a> <a href='第十二周~第十五周.html'>Next</a> >> 第十二周~第十五周</div>
+        
+    <!-- footer -->
+      <div class="container">
+        <div class="row pt-3 mx-auto">
+            <p>
+            <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+            Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="icon-heart" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank" >Colorlib</a>
+            <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+            </p>
+        </div>
+      </div>
+    <!-- for footer -->
+    
+        </div> <!-- for site wrap -->
+            <!-- <script src="../cmsimde/static/chimper/js/jquery-3.3.1.min.js"></script> -->
+            <script src="../cmsimde/static/chimper/js/jquery-migrate-3.0.1.min.js"></script>
+            <script src="../cmsimde/static/chimper/js/jquery-ui.js"></script>
+            <script src="../cmsimde/static/chimper/js/popper.min.js"></script>
+            <script src="../cmsimde/static/chimper/js/bootstrap.min.js"></script>
+            <script src="../cmsimde/static/chimper/js/owl.carousel.min.js"></script>
+            <script src="../cmsimde/static/chimper/js/jquery.stellar.min.js"></script>
+            <script src="../cmsimde/static/chimper/js/jquery.countdown.min.js"></script>
+            <script src="../cmsimde/static/chimper/js/jquery.magnific-popup.min.js"></script>
+            <script src="../cmsimde/static/chimper/js/bootstrap-datepicker.min.js"></script>
+            <script src="../cmsimde/static/chimper/js/aos.js"></script>
+            <!--
+            <script src="../cmsimde/static/chimper/js/typed.js"></script>
+                    <script>
+                    var typed = new Typed('.typed-words', {
+                    strings: ["Web Apps"," WordPress"," Mobile Apps"],
+                    typeSpeed: 80,
+                    backSpeed: 80,
+                    backDelay: 4000,
+                    startDelay: 1000,
+                    loop: true,
+                    showCursor: true
+                    });
+                    </script>
+            -->
+            <script src="../cmsimde/static/chimper/js/main.js"></script>
+        </body></html>
+        
