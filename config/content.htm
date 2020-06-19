@@ -146,5 +146,30 @@ Host github.com
 </ul>
 <p><img alt="" height="283" src="/images/MEET.png" width="527"/></p>
 <ul>
-<li></li>
+<li>設定NGINX的內容</li>
+<li>使用Pypdf2來切割pdf</li>
+<li>
+<pre class="brush:py;auto-links:false;toolbar:false" contenteditable="false"># pypdf2_ex1.py
+import os
+from PyPDF2 import PdfFileWriter, PdfFileReader
+ 
+pdfReader = PdfFileReader(open("2002_Book_Real-WorldASPNETBuildingAConte.pdf", "rb"))
+information = [("WhatIsCMS",18,45)]
+ 
+for page in range(len(information)):
+    pdf_writer = PdfFileWriter()
+    start = information[page][1]
+    end = information[page][2]
+    while start&lt;=end:
+        pdf_writer.addPage(pdfReader.getPage(start-1))
+        start+=1
+    if not os.path.exists("./"):
+        os.makedirs(savepath)
+    output_filename = '{}_{}_page_{}.pdf'.format(information[page][0],information[page][1], information[page][2])
+    with open(output_filename,'wb') as out:
+        pdf_writer.write(out)</pre>
+<p></p>
+</li>
+<li>用HxD修改pip.exe</li>
 </ul>
+<p></p>
