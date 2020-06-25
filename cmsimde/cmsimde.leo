@@ -10,6 +10,14 @@
 <v t="leo.20190515144024.2"><vh>@data qt-gui-plugin-style-sheet</vh></v>
 <v t="leo.20190515144024.3"><vh>@string initial_split_orientation = horizontal</vh></v>
 </v>
+<v t="leo.20190515143956.2"><vh>@path ./../</vh>
+<v t="leo.20190515144114.1"><vh>@clean init.py</vh>
+<v t="leo.20190515144135.1"><vh>Declarations (init.py)</vh></v>
+<v t="leo.20190515144135.2"><vh>class Init(object)</vh>
+<v t="leo.20190515144135.3"><vh>Init(object).__init__</vh></v>
+</v>
+</v>
+</v>
 <v t="leo.20190515144242.1"><vh>@clean wsgi.py</vh>
 <v t="leo.20190515144254.1"><vh>Declarations (wsgi.py)</vh></v>
 </v>
@@ -94,6 +102,7 @@
 </v>
 </vnodes>
 <tnodes>
+<t tx="leo.20190515143956.2"></t>
 <t tx="leo.20190515144024.1"></t>
 <t tx="leo.20190515144024.2">QSplitter::handle {
     background-color: #CAE1FF; /* lightSteelBlue1 */
@@ -188,6 +197,41 @@ QLineEdit#editorLabel {
 }</t>
 <t tx="leo.20190515144024.3">horizontal: body pane to the left
 vertical: body pane on the botton</t>
+<t tx="leo.20190515144114.1">@others
+@language python
+@tabwidth -4
+</t>
+<t tx="leo.20190515144135.1">import os
+
+"""CMSimfly 程式起始設定
+"""
+
+# 確定程式檔案所在目錄, 在 Windows 有最後的反斜線
+_curdir = os.path.join(os.getcwd(), os.path.dirname(__file__))
+# 設定在 uwsgi 與近端的資料儲存目錄
+config_dir = _curdir + "/config/"
+</t>
+<t tx="leo.20190515144135.2">class Init(object):
+    # uwsgi as static class variable, can be accessed by Init.uwsgi
+    uwsgi = False
+    site_title = "CMSiMDE"
+    @others
+</t>
+<t tx="leo.20190515144135.3">def __init__(self):
+    # hope to create downloads and images directories　
+    if not os.path.isdir(_curdir + "/downloads"):
+        try:
+            os.makedirs(_curdir + "/downloads")
+        except:
+            print("mkdir error")
+    if not os.path.isdir(_curdir + "/images"):
+        try:
+            os.makedirs(_curdir + "/images")
+        except:
+            print("mkdir error")
+
+
+</t>
 <t tx="leo.20190515144224.1"># coding: utf-8
 
 @others
@@ -196,13 +240,11 @@ if __name__ == "__main__":
 @language python
 @tabwidth -4
 </t>
-<t tx="leo.20190515144237.1">"""Flask Main program
+<t tx="leo.20190515144237.1">"""Flask 主程式
 """
 
 from flask import Flask, send_from_directory, request, redirect, \
     render_template, session, make_response, url_for, flash
-# python -m pip install flask_cors
-from flask_cors import CORS
 import random
 import math
 import os
@@ -215,9 +257,7 @@ import hashlib
 import urllib.parse
 # use cgi.escape() to resemble php htmlspecialchars()
 # use cgi.escape() or html.escape to generate data for textarea tag, otherwise Editor can not deal with some Javascript code.
-# for python 3.8 import html to replace cgi
-from html import escape as html_escape
-#import cgi
+import cgi
 import os
 import sys
 # for new parse_content function
@@ -258,7 +298,6 @@ uwsgi = init.Init.uwsgi
 
 # 必須先將 download_dir 設為 static_folder, 然後才可以用於 download 方法中的 app.static_folder 的呼叫
 app = Flask(__name__)
-CORS(app, support_credentials=False)
 
 # 設置隨後要在 blueprint 應用程式中引用的 global 變數
 app.config['config_dir'] = config_dir
@@ -339,9 +378,7 @@ def edit_page(edit):
         head, level, page = parse_content()
         directory = render_menu(head, level, page)
         pagedata =file_get_contents(config_dir + "content.htm")
-        #outstring = tinymce_editor(directory, cgi.escape(pagedata))
-        # for python 3.8
-        outstring = tinymce_editor(directory, html_escape(pagedata))
+        outstring = tinymce_editor(directory, cgi.escape(pagedata))
         return outstring
 
 
@@ -770,14 +807,14 @@ def get_page(heading, edit):
                                       last_page + " " + next_page + "&lt;br /&gt;&lt;hr&gt;"
             pagedata_duplicate = "&lt;h"+level[page_order] + "&gt;" + heading + \
                                           "&lt;/h"+level[page_order] + "&gt;" + page_content_list[i]
-            outstring_list.append(last_page + " " + next_page + "&lt;br /&gt;" + tinymce_editor(directory, html_escape(pagedata_duplicate), page_order))
+            outstring_list.append(last_page + " " + next_page + "&lt;br /&gt;" + tinymce_editor(directory, cgi.escape(pagedata_duplicate), page_order))
         else:
             return_content += last_page + " " + next_page + "&lt;br /&gt;&lt;h1&gt;" +\
                                       heading + "&lt;/h1&gt;" + page_content_list[i] + "&lt;br /&gt;" + last_page + " " + next_page
             
         pagedata += "&lt;h"+level[page_order] + "&gt;" + heading + "&lt;/h" + level[page_order] + "&gt;" + page_content_list[i]
-        # 利用 html_escape() 將 specialchar 轉成只能顯示的格式
-        outstring += last_page + " " + next_page + "&lt;br /&gt;" + tinymce_editor(directory, html_escape(pagedata), page_order)
+        # 利用 cgi.escape() 將 specialchar 轉成只能顯示的格式
+        outstring += last_page + " " + next_page + "&lt;br /&gt;" + tinymce_editor(directory, cgi.escape(pagedata), page_order)
     
     # edit=0 for viewpage
     if edit == 0:
@@ -797,7 +834,7 @@ def get_page(heading, edit):
                 return outstring_duplicate
             else:
             #pagedata = "&lt;h"+level[page_order]+"&gt;"+heading+"&lt;/h"+level[page_order]+"&gt;"+search_content(head, page, heading)
-            #outstring = last_page+" "+next_page+"&lt;br /&gt;"+ tinymce_editor(directory, html_escape(pagedata), page_order)
+            #outstring = last_page+" "+next_page+"&lt;br /&gt;"+ tinymce_editor(directory, cgi.escape(pagedata), page_order)
                 return outstring
 
 
@@ -829,7 +866,7 @@ def get_page(heading, edit):
         heading = head[0]
     # 因為同一 heading 可能有多頁, 因此不可使用 head.index(heading) 搜尋 page_order
     page_order_list, page_content_list = search_content(head, page, heading)
-    if get_page_content != None:
+    if get_page_content is not None:
         get_page_content.extend(page_content_list)
     return_content = ""
     pagedata = ""
@@ -855,7 +892,7 @@ def get_page(heading, edit):
                                       heading + "&lt;/h1&gt;" + page_content_list[i] + \
                                       "&lt;br /&gt;" + last_page + " "+ next_page + "&lt;br /&gt;&lt;hr&gt;"
             pagedata_duplicate = "&lt;h"+level[page_order] + "&gt;" + heading + "&lt;/h" + level[page_order]+"&gt;"+page_content_list[i]
-            outstring_list.append(last_page + " " + next_page + "&lt;br /&gt;" + tinymce_editor(directory, html_escape(pagedata_duplicate), page_order))
+            outstring_list.append(last_page + " " + next_page + "&lt;br /&gt;" + tinymce_editor(directory, cgi.escape(pagedata_duplicate), page_order))
         else:
             return_content += last_page + " " + next_page + "&lt;br /&gt;&lt;h1&gt;" + \
                                       heading + "&lt;/h1&gt;" + page_content_list[i] + \
@@ -863,8 +900,8 @@ def get_page(heading, edit):
             
         pagedata += "&lt;h" + level[page_order] + "&gt;" + heading + \
                           "&lt;/h" + level[page_order] + "&gt;" + page_content_list[i]
-        # 利用 html_escape() 將 specialchar 轉成只能顯示的格式
-        outstring += last_page + " " + next_page + "&lt;br /&gt;" + tinymce_editor(directory, html_escape(pagedata), page_order)
+        # 利用 cgi.escape() 將 specialchar 轉成只能顯示的格式
+        outstring += last_page + " " + next_page + "&lt;br /&gt;" + tinymce_editor(directory, cgi.escape(pagedata), page_order)
     
     # edit=0 for viewpage
     if edit == 0:
@@ -928,7 +965,7 @@ def get_page(heading, edit):
                 return outstring_duplicate
             else:
             #pagedata = "&lt;h" + level[page_order]+"&gt;" + heading + "&lt;/h" + level[page_order] + "&gt;" + search_content(head, page, heading)
-            #outstring = last_page + " " + next_page + "&lt;br /&gt;" + tinymce_editor(directory, html_escape(pagedata), page_order)
+            #outstring = last_page + " " + next_page + "&lt;br /&gt;" + tinymce_editor(directory, cgi.escape(pagedata), page_order)
                 return outstring
 
 
@@ -1019,7 +1056,7 @@ def image_list():
             keyword = request.args.get('keyword')
             session['image_keyword'] = keyword
     files = os.listdir(image_dir)
-    if keyword != "":
+    if keyword is not "":
         files = [elem for elem in files if str(keyword) in elem]
     files.sort()
     total_rows = len(files)
@@ -1537,7 +1574,7 @@ def download_list():
             keyword = request.args.get('keyword')
             session['download_keyword'] = keyword
     files = os.listdir(download_dir)
-    if keyword != "":
+    if keyword is not "":
         files = [elem for elem in files if str(keyword) in elem]
     files.sort()
     total_rows = len(files)
@@ -2174,7 +2211,7 @@ def ssavePage():
 &lt;link type="text/css" rel="stylesheet" href="/static/syntaxhighlighter/css/shCoreDefault.css"/&gt;
 &lt;script type="text/javascript"&gt;SyntaxHighlighter.all();&lt;/script&gt;
 
-&lt;!-- 啟用 LaTeX equations 編輯 --&gt;
+&lt;!-- for LaTeX equations 暫時不用
     &lt;script src="https://scrum-3.github.io/web/math/MathJax.js?config=TeX-MML-AM_CHTML" type="text/javascript"&gt;&lt;/script&gt;
     &lt;script type="text/javascript"&gt;
     init_mathjax = function() {
@@ -2195,6 +2232,7 @@ def ssavePage():
     }
     init_mathjax();
     &lt;/script&gt;
+ --&gt;
  &lt;!-- 暫時不用
 &lt;script src="/static/fengari-web.js"&gt;&lt;/script&gt;
 &lt;script type="text/javascript" src="/static/Cango-13v08-min.js"&gt;&lt;/script&gt;
@@ -2205,11 +2243,6 @@ def ssavePage():
 &lt;script src="https://scrum-3.github.io/web/brython/brython.js"&gt;&lt;/script&gt;
 &lt;script src="https://scrum-3.github.io/web/brython/brython_stdlib.js"&gt;&lt;/script&gt;
 --&gt;
-&lt;style&gt;
-img.add_border {
-    border: 3px solid blue;
-}
-&lt;/style&gt;
 '''
 
 
@@ -2233,7 +2266,7 @@ img.add_border {
 &lt;link type="text/css" rel="stylesheet" href="./../cmsimde/static/syntaxhighlighter/css/shCoreDefault.css"/&gt;
 &lt;script type="text/javascript"&gt;SyntaxHighlighter.all();&lt;/script&gt;
 
-&lt;!-- 啟用 LaTeX equations 編輯 --&gt;
+&lt;!-- for LaTeX equations 暫時不用
 &lt;script src="https://scrum-3.github.io/web/math/MathJax.js?config=TeX-MML-AM_CHTML" type="text/javascript"&gt;&lt;/script&gt;
 &lt;script type="text/javascript"&gt;
 init_mathjax = function() {
@@ -2254,7 +2287,7 @@ init_mathjax = function() {
 }
 init_mathjax();
 &lt;/script&gt;
-
+--&gt;
 &lt;!-- 暫時不用
 &lt;script src="./../cmsimde/static/fengari-web.js"&gt;&lt;/script&gt;
 &lt;script type="text/javascript" src="./../cmsimde/static/Cango-13v08-min.js"&gt;&lt;/script&gt;
@@ -2265,11 +2298,6 @@ init_mathjax();
 &lt;script src="https://scrum-3.github.io/web/brython/brython.js"&gt;&lt;/script&gt;
 &lt;script src="https://scrum-3.github.io/web/brython/brython_stdlib.js"&gt;&lt;/script&gt;
 --&gt;
-&lt;style&gt;
-img.add_border {
-    border: 3px solid blue;
-}
-&lt;/style&gt;
 '''
 
 
@@ -2709,28 +2737,28 @@ def logout():
 </t>
 <t tx="leo.20190515144242.1">#!/usr/bin/python
 
-"""Flask startup script
+"""Flask 網際伺服器啟動檔案
 """
 
 @others
 if uwsgi:
-    # run on remote site
+    # 表示程式在雲端執行
     application = flaskapp.app
 else:
-    # on localhost, on Linux or Mac need to use python3 wsgi.py to execute
+    # 表示在近端執行, 以 python3 wsgi.py 執行
     flaskapp.app.run(host='127.0.0.1', port=9443, debug=True, ssl_context=context)
 @language python
 @tabwidth -4
 </t>
-<t tx="leo.20190515144254.1"># import flaskapp at the same directory
+<t tx="leo.20190515144254.1"># 導入同目錄下的 flaskapp.py
 import flaskapp
 import ssl
 
-# even on localhost still use https to access
+# 即使在近端仍希望以 https 模式下執行
 context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
 context.load_cert_chain('localhost.crt', 'localhost.key')
 
-# get uwsgi variable value of flaskapp.py
+# 取 flaskapp.py 中的 uwsgi 變數設定
 uwsgi = flaskapp.uwsgi
 </t>
 <t tx="leo.20190603204847.1"></t>
@@ -2740,12 +2768,12 @@ uwsgi = flaskapp.uwsgi
 </t>
 <t tx="leo.20190603204931.1">import os
 
-"""CMSimfly Initialization setup
+"""CMSimfly 程式起始設定
 """
 
-# get current directory, on Windows, back slash at the end of the directory
+# 確定程式檔案所在目錄, 在 Windows 有最後的反斜線
 _curdir = os.path.join(os.getcwd(), os.path.dirname(__file__))
-# config directory
+# 設定在 uwsgi 與近端的資料儲存目錄
 config_dir = _curdir + "/config/"
 </t>
 <t tx="leo.20190603204931.2">class Init(object):

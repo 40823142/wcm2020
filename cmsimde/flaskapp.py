@@ -1,6 +1,6 @@
 # coding: utf-8
 
-"""Flask Main program
+"""Flask 主程式
 """
 
 from flask import Flask, send_from_directory, request, redirect, \
@@ -19,9 +19,7 @@ import hashlib
 import urllib.parse
 # use cgi.escape() to resemble php htmlspecialchars()
 # use cgi.escape() or html.escape to generate data for textarea tag, otherwise Editor can not deal with some Javascript code.
-# for python 3.8 import html to replace cgi
-from html import escape as html_escape
-#import cgi
+import cgi
 import os
 import sys
 # for new parse_content function
@@ -230,7 +228,7 @@ def download_list():
             keyword = request.args.get('keyword')
             session['download_keyword'] = keyword
     files = os.listdir(download_dir)
-    if keyword != "":
+    if keyword is not "":
         files = [elem for elem in files if str(keyword) in elem]
     files.sort()
     total_rows = len(files)
@@ -440,9 +438,7 @@ def edit_page(edit):
         head, level, page = parse_content()
         directory = render_menu(head, level, page)
         pagedata =file_get_contents(config_dir + "content.htm")
-        #outstring = tinymce_editor(directory, cgi.escape(pagedata))
-        # for python 3.8
-        outstring = tinymce_editor(directory, html_escape(pagedata))
+        outstring = tinymce_editor(directory, cgi.escape(pagedata))
         return outstring
 
 
@@ -843,14 +839,14 @@ def get_page(heading, edit):
                                       last_page + " " + next_page + "<br /><hr>"
             pagedata_duplicate = "<h"+level[page_order] + ">" + heading + \
                                           "</h"+level[page_order] + ">" + page_content_list[i]
-            outstring_list.append(last_page + " " + next_page + "<br />" + tinymce_editor(directory, html_escape(pagedata_duplicate), page_order))
+            outstring_list.append(last_page + " " + next_page + "<br />" + tinymce_editor(directory, cgi.escape(pagedata_duplicate), page_order))
         else:
             return_content += last_page + " " + next_page + "<br /><h1>" +\
                                       heading + "</h1>" + page_content_list[i] + "<br />" + last_page + " " + next_page
             
         pagedata += "<h"+level[page_order] + ">" + heading + "</h" + level[page_order] + ">" + page_content_list[i]
-        # 利用 html_escape() 將 specialchar 轉成只能顯示的格式
-        outstring += last_page + " " + next_page + "<br />" + tinymce_editor(directory, html_escape(pagedata), page_order)
+        # 利用 cgi.escape() 將 specialchar 轉成只能顯示的格式
+        outstring += last_page + " " + next_page + "<br />" + tinymce_editor(directory, cgi.escape(pagedata), page_order)
     
     # edit=0 for viewpage
     if edit == 0:
@@ -870,7 +866,7 @@ def get_page(heading, edit):
                 return outstring_duplicate
             else:
             #pagedata = "<h"+level[page_order]+">"+heading+"</h"+level[page_order]+">"+search_content(head, page, heading)
-            #outstring = last_page+" "+next_page+"<br />"+ tinymce_editor(directory, html_escape(pagedata), page_order)
+            #outstring = last_page+" "+next_page+"<br />"+ tinymce_editor(directory, cgi.escape(pagedata), page_order)
                 return outstring
 
 
@@ -901,7 +897,7 @@ def get_page2(heading, head, edit, get_page_content = None):
         heading = head[0]
     # 因為同一 heading 可能有多頁, 因此不可使用 head.index(heading) 搜尋 page_order
     page_order_list, page_content_list = search_content(head, page, heading)
-    if get_page_content != None:
+    if get_page_content is not None:
         get_page_content.extend(page_content_list)
     return_content = ""
     pagedata = ""
@@ -927,7 +923,7 @@ def get_page2(heading, head, edit, get_page_content = None):
                                       heading + "</h1>" + page_content_list[i] + \
                                       "<br />" + last_page + " "+ next_page + "<br /><hr>"
             pagedata_duplicate = "<h"+level[page_order] + ">" + heading + "</h" + level[page_order]+">"+page_content_list[i]
-            outstring_list.append(last_page + " " + next_page + "<br />" + tinymce_editor(directory, html_escape(pagedata_duplicate), page_order))
+            outstring_list.append(last_page + " " + next_page + "<br />" + tinymce_editor(directory, cgi.escape(pagedata_duplicate), page_order))
         else:
             return_content += last_page + " " + next_page + "<br /><h1>" + \
                                       heading + "</h1>" + page_content_list[i] + \
@@ -935,8 +931,8 @@ def get_page2(heading, head, edit, get_page_content = None):
             
         pagedata += "<h" + level[page_order] + ">" + heading + \
                           "</h" + level[page_order] + ">" + page_content_list[i]
-        # 利用 html_escape() 將 specialchar 轉成只能顯示的格式
-        outstring += last_page + " " + next_page + "<br />" + tinymce_editor(directory, html_escape(pagedata), page_order)
+        # 利用 cgi.escape() 將 specialchar 轉成只能顯示的格式
+        outstring += last_page + " " + next_page + "<br />" + tinymce_editor(directory, cgi.escape(pagedata), page_order)
     
     # edit=0 for viewpage
     if edit == 0:
@@ -1000,7 +996,7 @@ def get_page2(heading, head, edit, get_page_content = None):
                 return outstring_duplicate
             else:
             #pagedata = "<h" + level[page_order]+">" + heading + "</h" + level[page_order] + ">" + search_content(head, page, heading)
-            #outstring = last_page + " " + next_page + "<br />" + tinymce_editor(directory, html_escape(pagedata), page_order)
+            #outstring = last_page + " " + next_page + "<br />" + tinymce_editor(directory, cgi.escape(pagedata), page_order)
                 return outstring
 
 
@@ -1088,7 +1084,7 @@ def image_list():
             keyword = request.args.get('keyword')
             session['image_keyword'] = keyword
     files = os.listdir(image_dir)
-    if keyword != "":
+    if keyword is not "":
         files = [elem for elem in files if str(keyword) in elem]
     files.sort()
     total_rows = len(files)
@@ -2309,7 +2305,7 @@ def syntaxhighlight():
 <link type="text/css" rel="stylesheet" href="/static/syntaxhighlighter/css/shCoreDefault.css"/>
 <script type="text/javascript">SyntaxHighlighter.all();</script>
 
-<!-- 啟用 LaTeX equations 編輯 -->
+<!-- for LaTeX equations 暫時不用
     <script src="https://scrum-3.github.io/web/math/MathJax.js?config=TeX-MML-AM_CHTML" type="text/javascript"></script>
     <script type="text/javascript">
     init_mathjax = function() {
@@ -2330,6 +2326,7 @@ def syntaxhighlight():
     }
     init_mathjax();
     </script>
+ -->
  <!-- 暫時不用
 <script src="/static/fengari-web.js"></script>
 <script type="text/javascript" src="/static/Cango-13v08-min.js"></script>
@@ -2340,11 +2337,6 @@ def syntaxhighlight():
 <script src="https://scrum-3.github.io/web/brython/brython.js"></script>
 <script src="https://scrum-3.github.io/web/brython/brython_stdlib.js"></script>
 -->
-<style>
-img.add_border {
-    border: 3px solid blue;
-}
-</style>
 '''
 
 
@@ -2367,7 +2359,7 @@ def syntaxhighlight2():
 <link type="text/css" rel="stylesheet" href="./../cmsimde/static/syntaxhighlighter/css/shCoreDefault.css"/>
 <script type="text/javascript">SyntaxHighlighter.all();</script>
 
-<!-- 啟用 LaTeX equations 編輯 -->
+<!-- for LaTeX equations 暫時不用
 <script src="https://scrum-3.github.io/web/math/MathJax.js?config=TeX-MML-AM_CHTML" type="text/javascript"></script>
 <script type="text/javascript">
 init_mathjax = function() {
@@ -2388,7 +2380,7 @@ init_mathjax = function() {
 }
 init_mathjax();
 </script>
-
+-->
 <!-- 暫時不用
 <script src="./../cmsimde/static/fengari-web.js"></script>
 <script type="text/javascript" src="./../cmsimde/static/Cango-13v08-min.js"></script>
@@ -2399,11 +2391,6 @@ init_mathjax();
 <script src="https://scrum-3.github.io/web/brython/brython.js"></script>
 <script src="https://scrum-3.github.io/web/brython/brython_stdlib.js"></script>
 -->
-<style>
-img.add_border {
-    border: 3px solid blue;
-}
-</style>
 '''
 
 

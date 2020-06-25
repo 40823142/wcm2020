@@ -1,21 +1,21 @@
 #!/usr/bin/python
 
-"""Flask startup script
+"""Flask 網際伺服器啟動檔案
 """
 
-# import flaskapp at the same directory
+# 導入同目錄下的 flaskapp.py
 import flaskapp
 import ssl
 
-# even on localhost still use https to access
+# 即使在近端仍希望以 https 模式下執行
 context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
 context.load_cert_chain('localhost.crt', 'localhost.key')
 
-# get uwsgi variable value of flaskapp.py
+# 取 flaskapp.py 中的 uwsgi 變數設定
 uwsgi = flaskapp.uwsgi
 if uwsgi:
-    # run on remote site
+    # 表示程式在雲端執行
     application = flaskapp.app
 else:
-    # on localhost, on Linux or Mac need to use python3 wsgi.py to execute
+    # 表示在近端執行, 以 python3 wsgi.py 執行
     flaskapp.app.run(host='127.0.0.1', port=9443, debug=True, ssl_context=context)
